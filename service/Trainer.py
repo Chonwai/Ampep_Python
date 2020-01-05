@@ -23,9 +23,9 @@ class Trainer():
         self.nJobs = 4
 
     def training(self, fold=10, trees=100, model="RandomForestClassifier", method="KFold"):
-        # print(sorted(sklearn.metrics.SCORERS.keys()))
         self.trees = trees
-        for i in range(1, 51):
+        self.writeCSVHeader(method, fold, model)
+        for i in range(1, 31):
             trees = self.trees * i
             clf = self.modelSelector(model, trees)
             cv = self.cvSelector(method, fold)
@@ -55,19 +55,19 @@ class Trainer():
             print("ROC-AUC: ", rocAuc)
             print("K: ", k)
 
-            self.writeFile(sn, sp, accuracy, mcc, rocAuc, k, i, method, fold, model, trees)
+            self.writeCSVContent(sn, sp, accuracy, mcc, rocAuc, k, i, method, fold, model, trees)
             # self.calculateScore(score, fold, scoring=['accuracy'])
 
-    def writeFile(self, sn, sp, accuracy, mcc, rocAuc, k, i, method, fold, model, trees):
-        file = open("./report/" + model + "_" + method + ".txt", "a")
-        file.write("Finished Training Model " + str(i) + " Times with " +
-                   method + " Fold and " + str(trees) + " Trees! \n")
-        file.write("Sn: " + str(sn) + "\n")
-        file.write("Sp: " + str(sp) + "\n")
-        file.write("Accuracy: " + str(accuracy) + "\n")
-        file.write("MCC: " + str(mcc) + "\n")
-        file.write("ROC-AUC: " + str(rocAuc) + "\n")
-        file.write("K: " + str(k) + "\n")
+    def writeCSVHeader(self, method, fold, model):
+        file = open("./report/" + model + "_" + method + "_" + str(fold) + ".csv", "a")
+        file.write("ID,Sn,Sp,Accuracy,MCC,ROC-AUC,K,Details")
+        file.write("\n")
+        file.close()
+
+    def writeCSVContent(self, sn, sp, accuracy, mcc, rocAuc, k, i, method, fold, model, trees):
+        file = open("./report/" + model + "_" + method + "_" + str(fold) + ".csv", "a")
+        details = method + " " + str(fold) + " Fold and " + str(trees) + " Trees."
+        file.write(str(i) + "," + str(sn) + "," + str(sp) + "," + str(accuracy) + "," + str(mcc) + "," + str(rocAuc) + "," + str(k) + "," + details)
         file.write("\n")
         file.close()
 
@@ -79,18 +79,6 @@ class Trainer():
         print("Top Accuracy: " + str(max(score) * 100))
         print("Bottom Accuracy: " + str(min(score) * 100))
         print("")
-        # for i in scoring:
-        #     # name = 'test_' + i
-        #     name = 'test_score'
-        #     print(name)
-        #     meanAcc = statistics.mean(score[name])
-        #     # for i in score[name]:
-        #     #     meanAcc = meanAcc + i
-        #     # meanAcc = (meanAcc / fold) * 100
-        #     print("Mean Accuracy: " + str(meanAcc))
-        #     print("Top Accuracy: " + str(max(score[name]) * 100))
-        #     print("Bottom Accuracy: " + str(min(score[name]) * 100))
-        #     print("")
 
     def modelSelector(self, model, trees):
         if (model == "RandomForestClassifier"):
