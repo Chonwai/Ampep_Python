@@ -6,7 +6,7 @@ from sklearn.model_selection import permutation_test_score
 from sklearn.model_selection import cross_val_score, cross_validate, cross_val_predict
 from sklearn.model_selection import KFold, GroupKFold
 from sklearn.model_selection import StratifiedKFold
-from sklearn.model_selection import StratifiedShuffleSplit
+from sklearn.model_selection import StratifiedShuffleSplit, ShuffleSplit
 from sklearn.model_selection import RepeatedStratifiedKFold
 from sklearn.metrics import matthews_corrcoef, roc_auc_score, accuracy_score, cohen_kappa_score, confusion_matrix
 from sklearn import svm
@@ -107,6 +107,8 @@ class Trainer():
             cv = KFold(n_splits=fold)
         elif (method == "GroupKFold"):
             cv = GroupKFold(n_splits=fold)
+        elif (method == "ShuffleSplit"):
+            cv = ShuffleSplit(n_splits=fold)
         elif (method == "StratifiedKFold"):
             cv = StratifiedKFold(n_splits=fold)
         elif (method == "StratifiedShuffleSplit"):
