@@ -29,34 +29,74 @@ class Trainer():
             trees = self.trees * i
             clf = self.modelSelector(model, trees)
             cv = self.cvSelector(method, fold)
+            sn, sp, accuracy, mcc, rocAuc, k = self.trainCV(clf, cv)
             # score = cross_val_score(clf, self.X, self.y, cv=cv, n_jobs=4, scoring='accuracy')
-            score = cross_val_predict(clf, self.X, self.y, cv=cv, n_jobs=4)
-            # score = cross_validate(clf, self.X, self.y, cv=cv, n_jobs=4, return_train_score=True)
-            clf.fit(self.X, self.y)
+            # score = cross_val_predict(clf.fit(self.X, self.y), self.X, self.y, cv=cv, n_jobs=4)
+            # score = cross_validate(clf.fit(self.X, self.y), self.X, self.y, cv=cv, n_jobs=4, return_train_score=True)
+            # clf.fit(self.X, self.y)
+            # print(statistics.mean(score))
             print("Finished Training Model " + str(i) + " Times with " +
                   str(fold) + " Fold and " + str(trees) + " Trees!")
             # model = './model/Matlab/' + method + '/RF_' + method + '_' + str(fold) + '_' + str(trees + 100 * i) + '.pkl'
             # with open(model, 'wb') as file:
             #     pickle.dump(clf, file)
-            tn, fp, fn, tp = confusion_matrix(self.y, score).ravel()
+            # tn, fp, fn, tp = confusion_matrix(self.y, score).ravel()
 
-            sn = (tp / (tp + fn)) * 100
-            sp = (tn / (fp + tn)) * 100
-            accuracy = ((tp + tn) / (tp + fn + fp + tn)) * 100
-            mcc = (((tp * tn) - (fp * fn)) / (math.sqrt((tp + fp)
-                                                        * (tp + fn) * (fp + tn) * (tn + fn)))) * 100
-            rocAuc = roc_auc_score(self.y, score) * 100
-            k = cohen_kappa_score(self.y, score) * 100
+            # sn = (tp / (tp + fn)) * 100
+            # sp = (tn / (fp + tn)) * 100
+            # accuracy = ((tp + tn) / (tp + fn + fp + tn)) * 100
+            # mcc = (((tp * tn) - (fp * fn)) / (math.sqrt((tp + fp)
+            #                                             * (tp + fn) * (fp + tn) * (tn + fn)))) * 100
+            # rocAuc = roc_auc_score(self.y, score) * 100
+            # k = cohen_kappa_score(self.y, score) * 100
 
-            print("Sn: ", sn)
-            print("Sp: ", sp)
-            print("Accuracy: ", accuracy)
-            print("MCC: ", mcc)
-            print("ROC-AUC: ", rocAuc)
-            print("K: ", k)
+            # print("Sn: ", sn)
+            # print("Sp: ", sp)
+            # print("Accuracy: ", accuracy)
+            # print("MCC: ", mcc)
+            # print("ROC-AUC: ", rocAuc)
+            # print("K: ", k)
 
-            self.writeCSVContent(sn, sp, accuracy, mcc, rocAuc, k, i, method, fold, model, trees)
-            # self.calculateScore(score, fold, scoring=['accuracy'])
+            self.writeCSVContent(sn, sp, accuracy, mcc, rocAuc, k, i, method, fold, model, trees) 
+
+    def trainCV(self, clf, cv):
+        snList = []
+        spList = []
+        accuracyList = []
+        mccList = []
+        rocAucList = []
+        kList = []
+        for train_index, test_index in cv.split(self.X, self.y):
+            train_X, test_X = self.X[train_index], self.X[test_index]
+            train_y, test_y = self.y[train_index], self.y[test_index]
+            clf.fit(train_X, train_y)
+            predict_y = clf.predict(test_X)
+            sn, sp, accuracy, mcc, rocAuc, k = self.calculateResult(test_y, predict_y)
+            snList.append(sn)
+            spList.append(sp)
+            accuracyList.append(accuracy)
+            mccList.append(mcc)
+            rocAucList.append(rocAuc)
+            kList.append(k)
+        print("Sn: ", statistics.mean(snList))
+        print("Sp: ", statistics.mean(spList))
+        print("Accuracy: ", statistics.mean(accuracyList))
+        print("MCC: ", statistics.mean(mccList))
+        print("ROC-AUC: ", statistics.mean(rocAucList))
+        print("K: ", statistics.mean(kList))
+        return statistics.mean(snList), statistics.mean(spList), statistics.mean(accuracyList), statistics.mean(mccList), statistics.mean(rocAucList), statistics.mean(kList)
+
+            
+    def calculateResult(self, test_y, predict_y):
+        tn, fp, fn, tp = confusion_matrix(test_y, predict_y).ravel()
+        sn = (tp / (tp + fn)) * 100
+        sp = (tn / (fp + tn)) * 100
+        accuracy = ((tp + tn) / (tp + fn + fp + tn)) * 100
+        mcc = (((tp * tn) - (fp * fn)) / (math.sqrt((tp + fp)
+                                                    * (tp + fn) * (fp + tn) * (tn + fn)))) * 100
+        rocAuc = roc_auc_score(test_y, predict_y) * 100
+        k = cohen_kappa_score(test_y, predict_y) * 100
+        return sn, sp, accuracy, mcc, rocAuc, k
 
     def writeCSVHeader(self, method, fold, model):
         file = open("./report/" + model + "_" + method + "_" + str(fold) + ".csv", "a")
