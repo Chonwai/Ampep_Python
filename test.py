@@ -17,11 +17,6 @@ def main():
     X = np.array(featureList)
 
     result = utils.predict(modelPath, X)
-
-    # count = 0
-    # for i in range(len(y)):
-    #     if (result[i] == y[i]):
-    #         count += 1
     
     print(result)
 

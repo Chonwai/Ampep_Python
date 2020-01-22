@@ -8,7 +8,10 @@ from service import Utils as Utils
 
 feature = sys.argv[1]
 model = sys.argv[2]
-trees = int(sys.argv[3])
+method = sys.argv[3]
+fold = int(sys.argv[4])
+trees = int(sys.argv[5])
+step = int(sys.argv[6])
 
 def main():
     GetFeature.getFeature('./data/trian_po_set3298_for_ampep_sever.fasta',
@@ -24,7 +27,7 @@ def main():
     y = np.concatenate((posY, negY))
 
     trainer = Trainer.Trainer(X, y)
-    trainer.trainingModel(trees, model, method)
+    trainer.trainingCV(fold, trees, model, method, step)
 
 start = timeit.default_timer()
 main()

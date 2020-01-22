@@ -10,13 +10,8 @@ class Utils():
         items = f.readlines()
         newArray = []
         for item in items:
-            # For .tsv
             tempArray = np.array(item.rstrip().split('\t'))
             newArray.append(tempArray[1:])
-
-            # For .csv
-            # tempArray = np.array(item.rstrip().split(','))
-            # newArray.append(tempArray[0:-1])
         newArray = np.array(newArray[1:])
         labelArray = []
         for i in range(len(newArray)):

@@ -21,20 +21,26 @@ class Trainer():
         self.trees = 100
         self.nJobs = 4
 
-    def training(self, fold=10, trees=100, model="RandomForestClassifier", method="ShuffleSplit"):
+    def trainingCV(self, fold=10, trees=100, model="RandomForestClassifier", method="ShuffleSplit", step=30):
         self.trees = trees
         self.writeCSVHeader(method, fold, model)
-        for i in range(1, 2):
-            trees = self.trees * i
+        for i in range(1, step + 1):
+            trees = trees + (100 * (i - 1))
+            self.trees = trees
             clf = self.modelSelector(model, trees)
             cv = self.cvSelector(method, fold)
-            # sn, sp, accuracy, mcc, rocAuc, k = self.trainCV(clf, cv)
-            self.trainFinal(clf, model, method)
+            sn, sp, accuracy, mcc, rocAuc, k = self.fitCV(clf, cv)
             print("Finished Training Model " + str(i) + " Times with " +
                   str(fold) + " Fold and " + str(trees) + " Trees!")
-            # self.writeCSVContent(sn, sp, accuracy, mcc, rocAuc, k, i, method, fold, model, trees) 
+            self.writeCSVContent(sn, sp, accuracy, mcc, rocAuc, k, i, method, fold, model, trees)
 
-    def trainCV(self, clf, cv):
+    def trainingModel(self, fold=10, trees=100, model="RandomForestClassifier"):
+        self.trees = trees
+        clf = self.modelSelector(model, trees)
+        self.fitModel(clf, model)
+        print("Finished Training " + model + " Model and " + str(trees) + " Trees! \n")
+
+    def fitCV(self, clf, cv):
         snList = []
         spList = []
         accuracyList = []
@@ -61,9 +67,9 @@ class Trainer():
         print("K: ", statistics.mean(kList))
         return statistics.mean(snList), statistics.mean(spList), statistics.mean(accuracyList), statistics.mean(mccList), statistics.mean(rocAucList), statistics.mean(kList)
 
-    def trainFinal(self, clf, model, method):
+    def fitModel(self, clf, model):
         clf.fit(self.X, self.y)
-        model = './model/' + model + '_' + method + '_' + str(self.trees) + '.pkl'
+        model = './model/' + model + '_' + str(self.trees) + '.pkl'
         with open(model, 'wb') as file:
             pickle.dump(clf, file)
             
