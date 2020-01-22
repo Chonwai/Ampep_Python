@@ -4,7 +4,6 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.datasets import make_classification
 from sklearn.model_selection import permutation_test_score
 from sklearn.model_selection import cross_val_score, cross_validate, cross_val_predict
-from sklearn.model_selection import KFold, GroupKFold
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import StratifiedShuffleSplit, ShuffleSplit
 from sklearn.model_selection import RepeatedStratifiedKFold
@@ -22,42 +21,18 @@ class Trainer():
         self.trees = 100
         self.nJobs = 4
 
-    def training(self, fold=10, trees=100, model="RandomForestClassifier", method="KFold"):
+    def training(self, fold=10, trees=100, model="RandomForestClassifier", method="ShuffleSplit"):
         self.trees = trees
         self.writeCSVHeader(method, fold, model)
-        for i in range(1, 31):
+        for i in range(1, 2):
             trees = self.trees * i
             clf = self.modelSelector(model, trees)
             cv = self.cvSelector(method, fold)
-            sn, sp, accuracy, mcc, rocAuc, k = self.trainCV(clf, cv)
-            # score = cross_val_score(clf, self.X, self.y, cv=cv, n_jobs=4, scoring='accuracy')
-            # score = cross_val_predict(clf.fit(self.X, self.y), self.X, self.y, cv=cv, n_jobs=4)
-            # score = cross_validate(clf.fit(self.X, self.y), self.X, self.y, cv=cv, n_jobs=4, return_train_score=True)
-            # clf.fit(self.X, self.y)
-            # print(statistics.mean(score))
+            # sn, sp, accuracy, mcc, rocAuc, k = self.trainCV(clf, cv)
+            self.trainFinal(clf, model, method)
             print("Finished Training Model " + str(i) + " Times with " +
                   str(fold) + " Fold and " + str(trees) + " Trees!")
-            # model = './model/Matlab/' + method + '/RF_' + method + '_' + str(fold) + '_' + str(trees + 100 * i) + '.pkl'
-            # with open(model, 'wb') as file:
-            #     pickle.dump(clf, file)
-            # tn, fp, fn, tp = confusion_matrix(self.y, score).ravel()
-
-            # sn = (tp / (tp + fn)) * 100
-            # sp = (tn / (fp + tn)) * 100
-            # accuracy = ((tp + tn) / (tp + fn + fp + tn)) * 100
-            # mcc = (((tp * tn) - (fp * fn)) / (math.sqrt((tp + fp)
-            #                                             * (tp + fn) * (fp + tn) * (tn + fn)))) * 100
-            # rocAuc = roc_auc_score(self.y, score) * 100
-            # k = cohen_kappa_score(self.y, score) * 100
-
-            # print("Sn: ", sn)
-            # print("Sp: ", sp)
-            # print("Accuracy: ", accuracy)
-            # print("MCC: ", mcc)
-            # print("ROC-AUC: ", rocAuc)
-            # print("K: ", k)
-
-            self.writeCSVContent(sn, sp, accuracy, mcc, rocAuc, k, i, method, fold, model, trees) 
+            # self.writeCSVContent(sn, sp, accuracy, mcc, rocAuc, k, i, method, fold, model, trees) 
 
     def trainCV(self, clf, cv):
         snList = []
@@ -86,6 +61,11 @@ class Trainer():
         print("K: ", statistics.mean(kList))
         return statistics.mean(snList), statistics.mean(spList), statistics.mean(accuracyList), statistics.mean(mccList), statistics.mean(rocAucList), statistics.mean(kList)
 
+    def trainFinal(self, clf, model, method):
+        clf.fit(self.X, self.y)
+        model = './model/' + model + '_' + method + '_' + str(self.trees) + '.pkl'
+        with open(model, 'wb') as file:
+            pickle.dump(clf, file)
             
     def calculateResult(self, test_y, predict_y):
         tn, fp, fn, tp = confusion_matrix(test_y, predict_y).ravel()
@@ -99,26 +79,17 @@ class Trainer():
         return sn, sp, accuracy, mcc, rocAuc, k
 
     def writeCSVHeader(self, method, fold, model):
-        file = open("./report/" + model + "_" + method + "_" + str(fold) + ".csv", "a")
+        file = open("./report/MATLAB_" + model + "_" + method + "_" + str(fold) + ".csv", "a")
         file.write("ID,Sn,Sp,Accuracy,MCC,ROC-AUC,K,Details")
         file.write("\n")
         file.close()
 
     def writeCSVContent(self, sn, sp, accuracy, mcc, rocAuc, k, i, method, fold, model, trees):
-        file = open("./report/" + model + "_" + method + "_" + str(fold) + ".csv", "a")
+        file = open("./report/MATLAB_" + model + "_" + method + "_" + str(fold) + ".csv", "a")
         details = method + " " + str(fold) + " Fold and " + str(trees) + " Trees."
         file.write(str(i) + "," + str(sn) + "," + str(sp) + "," + str(accuracy) + "," + str(mcc) + "," + str(rocAuc) + "," + str(k) + "," + details)
         file.write("\n")
         file.close()
-
-    def calculateScore(self, score, fold, scoring):
-        name = 'test_score'
-        print(name)
-        meanAcc = statistics.mean(score)
-        print("Mean Accuracy: " + str(meanAcc))
-        print("Top Accuracy: " + str(max(score) * 100))
-        print("Bottom Accuracy: " + str(min(score) * 100))
-        print("")
 
     def modelSelector(self, model, trees):
         if (model == "RandomForestClassifier"):
@@ -142,12 +113,8 @@ class Trainer():
         print(clf)
         return clf
 
-    def cvSelector(self, method="KFold", fold=10):
-        if (method == "KFold"):
-            cv = KFold(n_splits=fold)
-        elif (method == "GroupKFold"):
-            cv = GroupKFold(n_splits=fold)
-        elif (method == "ShuffleSplit"):
+    def cvSelector(self, method="ShuffleSplit", fold=10):
+        if (method == "ShuffleSplit"):
             cv = ShuffleSplit(n_splits=fold)
         elif (method == "StratifiedKFold"):
             cv = StratifiedKFold(n_splits=fold)
@@ -156,5 +123,5 @@ class Trainer():
         elif (method == "RepeatedStratifiedKFold"):
             cv = RepeatedStratifiedKFold(n_splits=fold)
         else:
-            cv = KFold(n_splits=fold)
+            cv = ShuffleSplit(n_splits=fold)
         return cv

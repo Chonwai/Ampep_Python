@@ -11,13 +11,13 @@ class Utils():
         newArray = []
         for item in items:
             # For .tsv
-            # tempArray = np.array(item.rstrip().split('\t'))
-            # newArray.append(tempArray[1:])
+            tempArray = np.array(item.rstrip().split('\t'))
+            newArray.append(tempArray[1:])
 
             # For .csv
-            tempArray = np.array(item.rstrip().split(','))
-            newArray.append(tempArray[0:-1])
-        newArray = np.array(newArray[0:])
+            # tempArray = np.array(item.rstrip().split(','))
+            # newArray.append(tempArray[0:-1])
+        newArray = np.array(newArray[1:])
         labelArray = []
         for i in range(len(newArray)):
             labelArray.append(y)
@@ -27,7 +27,6 @@ class Utils():
     def predict(self, path, X):
         with open(path, 'rb') as f:
             clf = pickle.load(f)
-            # result = clf.predict(X)
             result = clf.predict(X)
             return result
                 
