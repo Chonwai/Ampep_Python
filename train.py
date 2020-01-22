@@ -24,7 +24,7 @@ def main():
     y = np.concatenate((posY, negY))
 
     trainer = Trainer.Trainer(X, y)
-    trainer.trainingModel(trees, model, method)
+    trainer.trainingModel(trees, model)
 
 start = timeit.default_timer()
 main()

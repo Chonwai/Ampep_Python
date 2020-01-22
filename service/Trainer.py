@@ -25,8 +25,7 @@ class Trainer():
         self.trees = trees
         self.writeCSVHeader(method, fold, model)
         for i in range(1, step + 1):
-            trees = trees + (100 * (i - 1))
-            self.trees = trees
+            trees = self.trees + (100 * (i - 1))
             clf = self.modelSelector(model, trees)
             cv = self.cvSelector(method, fold)
             sn, sp, accuracy, mcc, rocAuc, k = self.fitCV(clf, cv)
@@ -34,7 +33,7 @@ class Trainer():
                   str(fold) + " Fold and " + str(trees) + " Trees!")
             self.writeCSVContent(sn, sp, accuracy, mcc, rocAuc, k, i, method, fold, model, trees)
 
-    def trainingModel(self, fold=10, trees=100, model="RandomForestClassifier"):
+    def trainingModel(self, trees=100, model="RandomForestClassifier"):
         self.trees = trees
         clf = self.modelSelector(model, trees)
         self.fitModel(clf, model)

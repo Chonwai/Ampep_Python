@@ -3,11 +3,12 @@ import numpy as np
 from service import Utils as Utils
 from service import GetFeature as GetFeature
 
-fastaPath = sys.argv[1]
-modelPath = sys.argv[2]
+feature = sys.argv[1]
+fastaPath = sys.argv[2]
+modelPath = sys.argv[3]
 
 def main():
-    GetFeature.getFeature(fastaPath, './data/test.tsv', 'CTDD')
+    GetFeature.getFeature(fastaPath, './data/test.tsv', feature)
 
     utils = Utils.Utils('Test')
 
@@ -22,4 +23,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    

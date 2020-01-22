@@ -4,7 +4,7 @@ This project is for the Ampep project of using Python
 ## Cross Validation Testing Case
 
 ### Parameters
-py train.py [feature] [Machine Learning Model] [Cross Validation Method] [Fold] [Trees] [Step]
+py train.py [Feature] [Machine Learning Model] [Cross Validation Method] [Fold] [Trees] [Step]
 
 ### Example
 py train.py CTDD RandomForestClassifier ShuffleSplit 10 800 30
@@ -12,7 +12,7 @@ py train.py CTDD RandomForestClassifier ShuffleSplit 10 800 30
 ## Training Case
 
 ### Parameters
-py train.py [feature] [Machine Learning Model] [Trees]
+py train.py [Feature] [Machine Learning Model] [Trees]
 
 ### Example
 py train.py CTDD RandomForestClassifier 800
@@ -20,7 +20,7 @@ py train.py CTDD RandomForestClassifier 800
 ## Testing Case
 
 ### Parameters
-py test.py [Fasta Path] [Model Path]
+py test.py [Feature] [Fasta Path] [Model Path]
 
 ### Example
-py test.py './data/input.fasta' './model/RandomForestClassifier_ShuffleSplit_800.pkl'
+py test.py CTDD './data/input.fasta' './model/RandomForestClassifier_800.pkl'
