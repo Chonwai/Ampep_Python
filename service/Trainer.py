@@ -84,13 +84,13 @@ class Trainer():
         return sn, sp, accuracy, mcc, rocAuc, k
 
     def writeCSVHeader(self, method, fold, model):
-        file = open("./report/MATLAB_" + model + "_" + method + "_" + str(fold) + ".csv", "a")
+        file = open("./report/iFeature_" + model + "_" + method + "_" + str(fold) + ".csv", "a")
         file.write("ID,Sn,Sp,Accuracy,MCC,ROC-AUC,K,Details")
         file.write("\n")
         file.close()
 
     def writeCSVContent(self, sn, sp, accuracy, mcc, rocAuc, k, i, method, fold, model, trees):
-        file = open("./report/MATLAB_" + model + "_" + method + "_" + str(fold) + ".csv", "a")
+        file = open("./report/iFeature_" + model + "_" + method + "_" + str(fold) + ".csv", "a")
         details = method + " " + str(fold) + " Fold and " + str(trees) + " Trees."
         file.write(str(i) + "," + str(sn) + "," + str(sp) + "," + str(accuracy) + "," + str(mcc) + "," + str(rocAuc) + "," + str(k) + "," + details)
         file.write("\n")

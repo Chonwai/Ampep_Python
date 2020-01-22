@@ -4,10 +4,10 @@ This project is for the Ampep project of using Python
 ## Cross Validation Testing Case
 
 ### Parameters
-py train.py [Feature] [Machine Learning Model] [Cross Validation Method] [Fold] [Trees] [Step]
+py cv.py [Feature] [Machine Learning Model] [Cross Validation Method] [Fold] [Trees] [Step]
 
 ### Example
-py train.py CTDD RandomForestClassifier ShuffleSplit 10 800 30
+py cv.py CTDD RandomForestClassifier ShuffleSplit 10 800 30
 
 #### Feature
 The feature method is base on the iFeature. For example in this program, we use 'CTDD' feature.
